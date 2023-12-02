@@ -1,0 +1,46 @@
+/* A SQL query that returns: the user ID, the user’s country, the user’s gender, the user’s device type, the user’s test group, whether or not they converted (spent > $0), and how much they spent in total ($0+)*/
+
+
+
+WITH users_and_activity_table AS(SELECT u.id AS d_id, SUM(COALESCE(a.spent,0)) AS amount,a.dt AS d_date,COALESCE(u.country,'undefined') AS d_country,COALESCE(u.gender,'undefined') AS d_gender,
+CASE
+WHEN SUM(COALESCE(a.spent,0)) = 0 THEN 0
+  ELSE 1
+ 
+END AS converted_or_not
+
+FROM users AS u
+LEFT JOIN activity AS a
+ON u.id = a.uid
+           
+           
+GROUP BY a.dt,u.id
+ORDER BY converted_or_not DESC)
+
+SELECT users_and_activity_table.d_id AS user_id, g.group AS user_group,g.join_dt AS join_date, COALESCE(users_and_activity_table.d_date) AS date_of_activity, users_and_activity_table.amount AS total_spent
+
+FROM users_and_activity_table
+INNER JOIN groups AS g
+ON users_and_activity_table.d_id = g.uid
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

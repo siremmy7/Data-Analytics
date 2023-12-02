@@ -1,0 +1,36 @@
+WITH user_and_activity_table AS(SELECT u.id AS d_id, SUM(COALESCE(a.spent,0)) AS amount,COALESCE(u.country,'undefined') AS d_country,COALESCE(u.gender,'undefined') AS d_gender,
+CASE
+WHEN SUM(COALESCE(a.spent,0)) = 0 THEN 0
+  ELSE 1
+ 
+END AS converted_or_not
+
+FROM users AS u
+LEFT JOIN activity AS a
+ON u.id = a.uid
+           
+           
+GROUP BY u.id
+ORDER BY converted_or_not DESC)
+
+SELECT user_and_activity_table.d_id AS user_id, user_and_activity_table.d_country AS user_country, user_and_activity_table.d_gender AS user_gender,COALESCE(g.device,'undefined') AS user_device_type,g.group AS user_group,user_and_activity_table.converted_or_not AS converted_or_not,user_and_activity_table.amount AS total_amount,CASE
+WHEN converted_or_not = 0 THEN 'not_converted'
+  ELSE 'converted'
+  
+  END AS converted_or_not_text
+
+FROM user_and_activity_table
+INNER JOIN groups AS g
+ON user_and_activity_table.d_id = g.uid
+
+
+
+
+
+
+
+
+
+
+
+
